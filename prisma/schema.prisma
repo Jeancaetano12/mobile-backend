@@ -1,0 +1,20 @@
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 2. Define o "cliente" que o NestJS usará para falar com o banco
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  nomeCompleto String
+  senha        String 
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
