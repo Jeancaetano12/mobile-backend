@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,8 +30,8 @@ export class AuthService {
         // Por fim, Registra o usuario
         const user = await this.prisma.user.create({
             data: {
-                email: dto.email,
                 nomeCompleto: dto.nomeCompleto,
+                email: dto.email,
                 senha: hashSenha,  
             },
         });
@@ -38,8 +39,22 @@ export class AuthService {
         return this.signToken(user.id, user.email);
     }
 
-    async login() {
+    async login(dto: LoginDto) {
+        const userLogin = await this.prisma.user.findUnique({
+            where: { email: dto.email },
+        })
 
+        if (!userLogin) {
+            throw new ForbiddenException('Email não cadastrado.');
+        } 
+
+        const verificaSenha = await bcrypt.compare(dto.senha, userLogin.senha);
+
+        if (!verificaSenha) {
+            throw new ForbiddenException('Senha incorreta.');
+        }
+        
+        return this.signToken(userLogin.id, userLogin.email);
     }
 
     async signToken(
