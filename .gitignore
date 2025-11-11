@@ -2,7 +2,7 @@
 /dist
 /node_modules
 /build
-/postgres-data
+
 
 # Logs
 logs
@@ -15,6 +15,7 @@ lerna-debug.log*
 
 # OS
 .DS_Store
+/postgres-data
 
 # Tests
 /coverage

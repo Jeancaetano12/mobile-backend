@@ -27,12 +27,16 @@ export class AuthService {
         const salt = await bcrypt.genSalt(10);
         const hashSenha = await bcrypt.hash(dto.senha, salt);
 
+        // Nome completo
+        const nomeCompletoCalculado = `${dto.primeiroNome} ${dto.sobrenome}`;
+
         // Por fim, Registra o usuario
         const user = await this.prisma.user.create({
             data: {
-                nomeCompleto: dto.nomeCompleto,
                 email: dto.email,
                 senha: hashSenha,  
+                primeiroNome: dto.primeiroNome,
+                nomeCompleto: nomeCompletoCalculado,
             },
         });
         // Retorna o token JWT

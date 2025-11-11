@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from './decorator/roles.decorator';
+import { RolesGuard } from './guard/roles.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -24,5 +26,15 @@ export class AuthController {
     @Get('profile')
     getProfile(@Req() req) {
         return req.user;
+    }
+
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles('ADMIN')
+    @Get('admin-test')
+    adminTest(@Req() req) {
+        return {
+            message: 'Acesso concedido apenas para ADMINs!',
+            user: req.user,
+        };
     }
 }

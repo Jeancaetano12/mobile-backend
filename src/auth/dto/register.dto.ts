@@ -3,7 +3,11 @@ import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 export class RegisterDto {
     @IsString()
     @IsNotEmpty({ message: 'O campo nome não pode estar vazio.' })
-    nomeCompleto: string;
+    primeiroNome: string;
+
+    @IsString()
+    @IsNotEmpty({ message: 'O campo sobrenome não pode estar vazio' })
+    sobrenome: string;
 
     @IsEmail({}, { message: 'Forneça um email válido.' })
     @IsNotEmpty({ message: 'Email inválido.' })
