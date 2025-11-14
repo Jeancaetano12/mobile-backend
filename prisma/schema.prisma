@@ -26,3 +26,58 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+// --- NOVOS MODELOS DE NEGÓCIO ---
+
+// Modelo da Família (Unidade Familiar)
+model Family {
+  id              String    @id @default(cuid())
+  // Ex: "Família Silva", "Família Oliveira"
+  sobrenome       String
+  endereco        String
+  contatoTelefone String? // O '?' torna opcional
+
+  // Relacionamento: Uma família tem muitos pacientes
+  pacientes Patient[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modelo do Paciente (Membro da Família)
+model Patient {
+  id             String    @id @default(cuid())
+  nomeCompleto   String
+  // É melhor salvar a data de nascimento do que a idade
+  dataNascimento DateTime
+  pacienteTelefone String?
+
+  // Relacionamento: O paciente pertence a UMA família
+  familiaId String
+  familia   Family @relation(fields: [familiaId], references: [id], onDelete: Cascade)
+  
+  // Relacionamento: Um paciente tem muitos indicadores
+  indicadores IndicadorSaude[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modelo dos Indicadores de Saúde
+model IndicadorSaude {
+  id               String   @id @default(cuid())
+  dataRegistro     DateTime @default(now())
+  
+  pesoKg           Float?   // ex: 80.5
+  pressaoArterial  String?  // ex: "120/80"
+  glicemiaMgDl     Int?     // ex: 99 (mg/dL)
+  alturaM          Float?   // ex: 1.80
+  // Adicione outros indicadores aqui (altura, etc)
+
+  // Relacionamento: O indicador pertence a UM paciente
+  pacienteId String
+  paciente   Patient @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
