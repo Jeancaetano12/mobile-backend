@@ -7,7 +7,7 @@ export class PatientService {
   // 1. Injetamos o PrismaService para falar com o banco
   constructor(private readonly prisma: PrismaService) {}
 
-  async addIndicator(patientCpf: string, dto: CreateIndicatorDto) {
+  async addIndicator(patientCpf: string, dto: CreateIndicatorDto, userId: string) {
     // 2. Primeiro, verificamos se o paciente realmente existe
     const patient = await this.prisma.patient.findUnique({
       where: { cpf: patientCpf },
@@ -27,6 +27,9 @@ export class PatientService {
             cpf: patientCpf,
           },
         },
+        criadoPor: {
+          connect: { id: userId },
+        }
       },
     });
 

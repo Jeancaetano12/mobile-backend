@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, Req } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFamilyDto } from './dto/create-family.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -11,13 +11,14 @@ export class FamilyService {
    * Cria uma nova família e seu primeiro paciente (paciente principal)
    * usando o "Nested Create" do Prisma.
    */
-  async create(dto: CreateFamilyDto) {
+  async create(dto: CreateFamilyDto, userId: string) {
     // 1. Desestruturamos o DTO
     const { pacientes, ...dadosFamilia } = dto;
 
     try {
       const novaFamilia = await this.prisma.family.create({
         data: {
+          criadoPor: { connect: { id: userId } },
           sobrenome: dadosFamilia.sobrenome,
           endereco: dadosFamilia.endereco,
           contatoTelefone: dadosFamilia.contatoTelefone || null,

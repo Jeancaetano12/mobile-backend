@@ -23,6 +23,8 @@ model User {
 
   role Role   @default(USER) 
   
+  indicadoresCriados IndicadorSaude[]
+  familiasCriadas   Family[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -37,6 +39,8 @@ model Family {
   endereco        String
   contatoTelefone String? // O '?' torna opcional
 
+  criadoPorId String
+  criadoPor   User @relation(fields: [criadoPorId], references: [id])
   // Relacionamento: Uma família tem muitos pacientes
   pacientes Patient[]
 
@@ -77,6 +81,9 @@ model IndicadorSaude {
   // Relacionamento: O indicador pertence a UM paciente
   pacienteCpf String
   paciente   Patient @relation(fields: [pacienteCpf], references: [cpf], onDelete: Cascade)
+
+  criadoPorId String
+  criadoPor  User @relation(fields: [criadoPorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

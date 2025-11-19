@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Get, Query, Param } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Get, Query, Param, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateFamilyDto } from './dto/create-family.dto';
 import { FamilyService } from './family.service';
@@ -10,13 +10,14 @@ export class FamilyController {
   // 1. Protegemos a rota. Apenas usuários logados podem criar famílias.
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  createFamily(@Body() dto: CreateFamilyDto) {
+  createFamily(@Body() dto: CreateFamilyDto, @Req() req) {
+    const usuarioId = req.user.id;
     // 2. O ValidationPipe (global) já validou o DTO,
     // incluindo o 'pacientePrincipal' aninhado.
 
     // 3. Chamamos o serviço para fazer a mágica do banco de dados
-    console.log('Requisição de criar familia recebida')
-    return this.familyService.create(dto);
+    console.log('Requisição de criar familia por usuário:', usuarioId);
+    return this.familyService.create(dto, usuarioId);
   }
 
   @UseGuards(AuthGuard('jwt'))

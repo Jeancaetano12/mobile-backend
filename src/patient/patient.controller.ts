@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -21,15 +22,17 @@ export class PatientController {
   addIndicator(
     @Param('patientCpf') patientCpf: string,
     @Body() dto: CreateIndicatorDto,
+    @Req() req,
   ) {
-    console.log('Indicador recebido no controller:', dto);
-    return this.patientService.addIndicator(patientCpf, dto);
+    const usuarioId = req.user.id;
+    console.log('Criar indicadores no controller:', dto, 'por:', usuarioId);
+    return this.patientService.addIndicator(patientCpf, dto, usuarioId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':cpf')
   findAllIndicators(@Param('cpf') cpf: string) {
-    console.log('CPF recebido na rota:', cpf);
+    console.log('Busca por indicadores:', cpf);
     return this.patientService.findAllIndicators(cpf);
   }
 
