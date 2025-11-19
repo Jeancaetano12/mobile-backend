@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Get, Query, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateFamilyDto } from './dto/create-family.dto';
 import { FamilyService } from './family.service';
@@ -18,4 +18,17 @@ export class FamilyController {
     console.log('Requisição de criar familia recebida')
     return this.familyService.create(dto);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  findAll(@Query('page') page: string = '1', @Query('limit') limit: string = '10') {
+    return this.familyService.findAll(page, limit);
+  }
+  
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':identifier')
+  findOne(@Param('identifier') identifier: string) {
+    return this.familyService.findOne(identifier);
+  }
+  
 }

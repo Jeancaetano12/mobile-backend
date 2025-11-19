@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -15,16 +16,21 @@ export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
 
-  // 2. Protegemos a rota (apenas usuários logados)
   @UseGuards(AuthGuard('jwt'))
-  // 3. Definimos a rota, capturando o 'patientId' da URL
-  @Post(':patientId/indicators')
+  @Post(':patientCpf/indicators')
   addIndicator(
-    // 4. Pegamos o 'patientId' da URL
-    @Param('patientId') patientId: string,
+    @Param('patientCpf') patientCpf: string,
     @Body() dto: CreateIndicatorDto,
   ) {
-    //    Chamamos o serviço para fazer o trabalho.
-    return this.patientService.addIndicator(patientId, dto);
+    console.log('Indicador recebido no controller:', dto);
+    return this.patientService.addIndicator(patientCpf, dto);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':cpf')
+  findAllIndicators(@Param('cpf') cpf: string) {
+    console.log('CPF recebido na rota:', cpf);
+    return this.patientService.findAllIndicators(cpf);
+  }
+
 }

@@ -46,7 +46,7 @@ model Family {
 
 // Modelo do Paciente (Membro da Família)
 model Patient {
-  id             String    @id @default(cuid())
+  cpf          String   @id
   nomeCompleto   String
   // É melhor salvar a data de nascimento do que a idade
   dataNascimento DateTime
@@ -75,8 +75,8 @@ model IndicadorSaude {
   // Adicione outros indicadores aqui (altura, etc)
 
   // Relacionamento: O indicador pertence a UM paciente
-  pacienteId String
-  paciente   Patient @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  pacienteCpf String
+  paciente   Patient @relation(fields: [pacienteCpf], references: [cpf], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

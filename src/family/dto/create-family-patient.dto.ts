@@ -1,6 +1,13 @@
 import { IsDateString, IsNotEmpty, IsString, IsOptional, Matches } from 'class-validator';
 
 export class CreateFamilyPatientDto {
+    @IsString({ message: 'O CPF deve ser um texto.' })
+    @IsNotEmpty({ message: 'O CPF é obrigatório.' })
+    @Matches(/^\d{11}$/, {
+        message: 'O CPF deve conter exatamente 11 dígitos numéricos.'
+    })
+    cpf: string;
+
     @IsString({ message: 'O nome completo deve ser um texto.' })
     @IsNotEmpty({ message: 'O nome completo é obrigatório.' })
     nomeCompleto: string;

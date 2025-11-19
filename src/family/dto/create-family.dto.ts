@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsObject,
   IsOptional,
+  IsArray,
   IsString,
   ValidateNested,
   Matches,
@@ -27,8 +28,8 @@ export class CreateFamilyDto {
   contatoTelefone?: string;
 
   @IsDefined({ message: 'Os dados do paciente principal são obrigatórios.' })
-  @IsObject({ message: 'Os dados do paciente devem ser um objeto.' })
-  @ValidateNested()
+  @IsArray({ message: 'Os pacientes devem ser enviados em uma lista (array).' })
+  @ValidateNested({ each: true })
   @Type(() => CreateFamilyPatientDto)
-  pacientePrincipal: CreateFamilyPatientDto;
+  pacientes: CreateFamilyPatientDto[];
 }

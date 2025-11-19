@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFamilyDto } from './dto/create-family.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class FamilyService {
@@ -12,35 +13,24 @@ export class FamilyService {
    */
   async create(dto: CreateFamilyDto) {
     // 1. Desestruturamos o DTO
-    const { pacientePrincipal, ...dadosFamilia } = dto;
+    const { pacientes, ...dadosFamilia } = dto;
 
-    // 2. Usamos o "Nested Create"
-    // O Prisma gerencia a transação automaticamente.
     try {
       const novaFamilia = await this.prisma.family.create({
         data: {
-          // 3. Dados da Família (nível superior)
           sobrenome: dadosFamilia.sobrenome,
           endereco: dadosFamilia.endereco,
-          contatoTelefone: dadosFamilia.contatoTelefone,
+          contatoTelefone: dadosFamilia.contatoTelefone || null,
 
-          // 4. Dados do Paciente (aninhados)
-          // Como 'pacientes' é um relacionamento em 'Family',
-          // podemos usar 'create' para criar um paciente JUNTO
           pacientes: {
-            create: [
-              // O 'create' espera uma lista
-              {
-                nomeCompleto: pacientePrincipal.nomeCompleto,
-                // Convertemos o string (YYYY-MM-DD) do DTO para um objeto Date
-                dataNascimento: new Date(pacientePrincipal.dataNascimento),
-                // O Prisma cuida automaticamente de associar o 'familiaId'
-                pacienteTelefone: pacientePrincipal.pacienteTelefone || null,
-              },
-            ],
+            create: pacientes.map((pacientes) => ({
+              cpf: pacientes.cpf,
+              nomeCompleto: pacientes.nomeCompleto,
+              dataNascimento: new Date(pacientes.dataNascimento),
+              pacienteTelefone: pacientes.pacienteTelefone || null,
+            })),
           },
         },
-        // 5. Incluímos o paciente criado na resposta
         include: {
           pacientes: true,
         },
@@ -48,9 +38,80 @@ export class FamilyService {
 
       return novaFamilia;
     } catch (error) {
-      // Lidar com erros (ex: falha de validação do banco)
+      // 2. Verifique se o erro é um erro conhecido do Prisma
+      if (error instanceof PrismaClientKnownRequestError) {
+        // 3. Verifique se é o erro de 'constraint única' (P2002)
+        if (error.code === 'P2002') {
+          // 4. Verifique se o erro foi no campo 'cpf'
+          // 'error.meta.target' nos diz qual campo falhou
+          if (error.meta && Array.isArray(error.meta.target) && error.meta.target.includes('cpf')) {
+            // 5. Retorne um erro 409 (Conflict) amigável
+            throw new ConflictException(
+              `Já existe um paciente cadastrado com o CPF informado.`,
+            );
+          }
+        }
+      }
+
+      // 6. Se for qualquer outro erro, retorne o erro genérico
       console.error('Erro ao criar família:', error);
       throw new Error('Não foi possível criar a família.');
     }
   }
+
+  async findAll(page:string, limit:string) {
+    const pageNum = Math.max(1, Math.floor(Number(page)));
+    const limitNum = Math.max(1, Math.floor(Number(limit)));
+
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
+    const families = await this.prisma.family.findMany({
+      skip: skip,
+      take: take,
+      orderBy: {
+        sobrenome: 'asc',
+      },
+      include: {
+        pacientes: true,
+      },
+    });
+
+    const totalFamilies = await this.prisma.family.count();
+
+    return {
+      data: families,
+      total: totalFamilies,
+      page: pageNum,
+      totalPages: Math.ceil(totalFamilies / limitNum),
+    };
+  }
+
+  async findOne(identifier: string) {
+    // 1. Tenta encontrar por ID primeiro (é o mais rápido e comum)
+    let family = await this.prisma.family.findUnique({
+      where: { id: identifier },
+      include: {
+        pacientes: true,
+      },
+    });
+
+    // 2. Se não encontrou por ID, tenta pelo Sobrenome
+    if (!family) {
+      family = await this.prisma.family.findFirst({ 
+        where: { sobrenome: identifier }, 
+        include: {
+          pacientes: true,
+        },
+      });
+    }
+
+    // 3. Se não encontrou de NENHUMA forma, lança o erro
+    if (!family) {
+      throw new NotFoundException(`Família com ID ou Sobrenome "${identifier}" não encontrada.`);
+    }
+
+    return family;
+  }
+
 }
