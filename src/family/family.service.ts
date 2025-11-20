@@ -20,7 +20,14 @@ export class FamilyService {
         data: {
           criadoPor: { connect: { id: userId } },
           sobrenome: dadosFamilia.sobrenome,
-          endereco: dadosFamilia.endereco,
+          cep: dadosFamilia.cep,
+          logradouro: dadosFamilia.logradouro,
+          numero: dadosFamilia.numero,
+          complemento: dadosFamilia.complemento || null,
+          unidade: dadosFamilia.unidade || null,
+          bairro: dadosFamilia.bairro,
+          localidade: dadosFamilia.localidade,
+          uf: dadosFamilia.uf,
           contatoTelefone: dadosFamilia.contatoTelefone || null,
 
           pacientes: {

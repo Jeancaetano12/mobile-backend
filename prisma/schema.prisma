@@ -36,7 +36,15 @@ model Family {
   id              String    @id @default(cuid())
   // Ex: "Família Silva", "Família Oliveira"
   sobrenome       String
-  endereco        String
+  cep             String
+  logradouro      String
+  numero          String?
+  complemento     String? 
+  unidade         String? 
+  bairro          String
+  localidade      String  
+  uf              String  
+
   contatoTelefone String? // O '?' torna opcional
 
   criadoPorId String

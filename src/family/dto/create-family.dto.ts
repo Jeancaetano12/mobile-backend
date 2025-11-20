@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateNested,
   Matches,
+  Length,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateFamilyPatientDto } from './create-family-patient.dto';
@@ -16,9 +17,40 @@ export class CreateFamilyDto {
   @IsNotEmpty({ message: 'O sobrenome é obrigatório.' })
   sobrenome: string;
 
-  @IsString({ message: 'O endereço deve ser um texto.' })
-  @IsNotEmpty({ message: 'O endereço é obrigatório.' })
-  endereco: string;
+  @IsString()
+  @IsNotEmpty({ message: 'O CEP é obrigatório.' })
+  // Aceita "60831-685" ou "60831685"
+  @Matches(/^(\d{8}|\d{5}-\d{3})$/, { message: 'CEP inválido.' })
+  cep: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'O logradouro é obrigatório.' })
+  logradouro: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'O número é obrigatório.' })
+  numero: string;
+
+  @IsString()
+  @IsOptional()
+  complemento?: string;
+
+  @IsString()
+  @IsOptional()
+  unidade?: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'O bairro é obrigatório.' })
+  bairro: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'A localidade (cidade) é obrigatória.' })
+  localidade: string;
+
+  @IsString()
+  @Length(2, 2, { message: 'A UF deve ter 2 letras (ex: CE).' })
+  @IsNotEmpty({ message: 'A UF é obrigatória.' })
+  uf: string;
 
   @IsString({ message: 'O telefone deve ser um texto.' })
   @IsOptional() 
