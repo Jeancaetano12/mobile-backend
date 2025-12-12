@@ -1,102 +1,60 @@
-# Pra usar o migrate no linux:
-```
-npx prisma migrate dev --shema ./prisma --name (nome da migration)
-```
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📳 Mobile Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este é o backend para a aplicação móvel, desenvolvido com [NestJS](https://nestjs.com/) e [Prisma ORM](https://www.prisma.io/). O projeto fornece uma API robusta, segura e escalável para servir um aplicativo que facilite o registro e acompanhamento de visitas domiciliares, organize os dados de pacientes e gere relatórios simples para análise de resultados, contribuindo para a melhoria da atenção básica nas comunidades atendidas.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## 🛠 Tecnologias Utilizadas
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **[NestJS](https://nestjs.com/)**: Framework Node.js para construção de aplicações server-side eficientes.
+- **[Prisma](https://www.prisma.io/)**: ORM de próxima geração para Node.js e TypeScript.
+- **[TypeScript](https://www.typescriptlang.org/)**: Superset de JavaScript com tipagem estática.
+- **[Docker](https://www.docker.com/)**: Para containerização de serviços (como a base de dados).
 
-## Project setup
+## 📋 Pré-requisitos
+
+Antes de começar, certifica-te de que tens as seguintes ferramentas instaladas na tua máquina:
+
+- [Node.js](https://nodejs.org/) (versão LTS recomendada)
+- [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/)
+- [Docker](https://www.docker.com/) e Docker Compose (opcional, para rodar a base de dados localmente)
+
+## Estrutura do projeto
 
 ```bash
-$ npm install
+mobile-backend/
+├── 📂 prisma/               # Schema do banco de dados e migrações
+│   └── schema.prisma
+├── 📂 src/
+│   ├── 📂 auth/             # Módulo de Autenticação
+│   │   ├── 📂 decorator/    # Decorators customizados (ex: @GetUser)
+│   │   ├── 📂 dto/          # DTOs de login e registo
+│   │   ├── 📂 guard/        # Guards para proteger rotas (JWT, etc)
+│   │   ├── 📂 strategy/     # Estratégias de auth (Passport/JWT)
+│   │   ├── auth.controller.ts
+│   │   ├── auth.module.ts
+│   │   └── auth.service.ts
+│   ├── 📂 family/           # Gestão de Famílias
+│   │   ├── 📂 dto/
+│   │   ├── family.controller.ts
+│   │   ├── family.module.ts
+│   │   └── family.service.ts
+│   ├── 📂 patient/          # Gestão de Pacientes
+│   │   ├── 📂 dto/
+│   │   ├── patient.controller.ts
+│   │   ├── patient.module.ts
+│   │   └── patient.service.ts
+│   ├── 📂 prisma/           # Serviço global de conexão ao DB
+│   │   ├── prisma.module.ts
+│   │   └── prisma.service.ts
+│   ├── 📂 reports/          # Módulo de Relatórios
+│   │   ├── reports.controller.ts
+│   │   ├── reports.module.ts
+│   │   └── reports.service.ts
+│   ├── app.controller.ts
+│   ├── app.module.ts        # Módulo raiz da aplicação
+│   ├── app.service.ts
+│   └── main.ts              # Arquivo de entrada (Bootstrap)
+├── 📂 test/                 # Testes end-to-end (e2e)
+├── docker-compose.yml
+└── package.json
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
